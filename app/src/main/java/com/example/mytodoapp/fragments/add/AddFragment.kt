@@ -1,8 +1,6 @@
 package com.example.mytodoapp.fragments.add
 
 import android.os.Bundle
-import android.text.TextUtils
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
@@ -14,16 +12,17 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.mytodoapp.R
-import com.example.mytodoapp.data.models.Priority
 import com.example.mytodoapp.data.models.ToDoData
 import com.example.mytodoapp.data.viewmodel.ToDoViewModel
 import com.example.mytodoapp.databinding.FragmentAddBinding
+import com.example.mytodoapp.fragments.SharedViewModel
 
 
 class AddFragment : Fragment() {
 
     private lateinit var binding: FragmentAddBinding
     private val viewModel by viewModels<ToDoViewModel>()
+    private val sharedVm by viewModels<SharedViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,6 +30,7 @@ class AddFragment : Fragment() {
     ): View? {
         setHasOptionsMenu(true)
         binding = FragmentAddBinding.inflate(inflater, container, false)
+        binding.spinner.onItemSelectedListener = sharedVm.listener
         return binding.root
     }
 
@@ -51,26 +51,16 @@ class AddFragment : Fragment() {
             val priority = spinner.selectedItem.toString()
             val desc = descEd.text.toString()
 
-            if (verifyData(title, desc)) {
-                val data = ToDoData(0, title, parsePriority(priority), desc)
+            if (sharedVm.verifyData(title, desc)) {
+                val data = ToDoData(0, title, sharedVm.parsePriority(priority), desc)
                 viewModel.insertData(data)
                 Toast.makeText(requireContext(), "Successfully added!", Toast.LENGTH_SHORT).show()
                 findNavController().navigate(R.id.action_addFragment_to_listFragment)
             } else {
-                Toast.makeText(requireContext(), "Please fill out all fields.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Please fill out all fields.", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
 
-    private fun verifyData(title: String, description: String): Boolean {
-        return title.isNotBlank() && description.isNotBlank()
-    }
-
-    private fun parsePriority(priority: String): Priority {
-        return when (priority) {
-            "High Priority" -> Priority.HIGH
-            "Medium Priority" -> Priority.MEDIUM
-            else -> Priority.LOW
-        }
-    }
 }

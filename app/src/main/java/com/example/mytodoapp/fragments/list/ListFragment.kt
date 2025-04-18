@@ -7,24 +7,38 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mytodoapp.R
+import com.example.mytodoapp.data.viewmodel.ToDoViewModel
 import com.example.mytodoapp.databinding.FragmentListBinding
 
 
 class ListFragment : Fragment() {
+
+    private val vm: ToDoViewModel by viewModels()
+    private val adapter: ListAdapter by lazy { ListAdapter() }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val binding = FragmentListBinding.inflate(inflater, container, false)
-        binding.addBtn.setOnClickListener {
-            findNavController().navigate(R.id.action_listFragment_to_addFragment)
+        with(binding) {
+            addBtn.setOnClickListener {
+                findNavController().navigate(R.id.action_listFragment_to_addFragment)
+            }
+            listLayout.setOnClickListener {
+                findNavController().navigate(R.id.action_listFragment_to_updateFragment)
+            }
+            recyclerView.adapter = adapter
+            recyclerView.layoutManager = LinearLayoutManager(requireActivity())
         }
-        binding.listLayout.setOnClickListener {
-            findNavController().navigate(R.id.action_listFragment_to_updateFragment)
-        }
-
+        vm.getAllData.observe(viewLifecycleOwner, Observer {
+            adapter.setData(it)
+        })
         setHasOptionsMenu(true)
         return binding.root
     }

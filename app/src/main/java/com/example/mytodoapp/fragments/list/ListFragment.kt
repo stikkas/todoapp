@@ -14,14 +14,17 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.transition.Visibility
 import com.example.mytodoapp.R
 import com.example.mytodoapp.data.viewmodel.ToDoViewModel
 import com.example.mytodoapp.databinding.FragmentListBinding
+import com.example.mytodoapp.fragments.SharedViewModel
 
 
 class ListFragment : Fragment() {
 
     private val vm: ToDoViewModel by viewModels()
+    private val sharedViewModel by viewModels<SharedViewModel>()
     private val adapter: ListAdapter by lazy { ListAdapter() }
 
     override fun onCreateView(
@@ -36,10 +39,18 @@ class ListFragment : Fragment() {
 
             recyclerView.adapter = adapter
             recyclerView.layoutManager = LinearLayoutManager(requireActivity())
+
+            sharedViewModel.emptyDatabase.observe(viewLifecycleOwner, Observer {
+                val visibility = if (it) View.VISIBLE else View.INVISIBLE
+                noDataTextView.visibility = visibility
+                noDataImageView.visibility = visibility
+            })
         }
         vm.getAllData.observe(viewLifecycleOwner, Observer {
+            sharedViewModel.checkIfDatabaseEmpty(it)
             adapter.setData(it)
         })
+
         setHasOptionsMenu(true)
         return binding.root
     }

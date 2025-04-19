@@ -15,14 +15,14 @@ interface ToDoDao {
     fun getAllData(): LiveData<List<ToDoData>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertData(data: ToDoData)
+    suspend fun insertData(data: ToDoData)
 
     @Update
-    fun updateData(data: ToDoData)
+    suspend fun updateData(data: ToDoData)
 
     @Delete
-    fun deleteItem(data: ToDoData)
+    suspend fun deleteItem(data: ToDoData)
 
     @Query("delete from todo")
-    fun deleteAll()
+    suspend fun deleteAll()
 }

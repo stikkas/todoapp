@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("com.google.devtools.ksp")
+    kotlin("kapt")
     id("kotlin-parcelize")
     id("androidx.navigation.safeargs")
 }
@@ -54,7 +54,7 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.room.common.jvm)
     implementation(libs.room.runtime)
-    ksp(libs.room.compiler)
+    kapt(libs.room.compiler)
     implementation( libs.room.ktx)
     testImplementation(libs.junit)
     androidTestImplementation( libs.room.testing)

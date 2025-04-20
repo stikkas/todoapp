@@ -12,9 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.transition.Visibility
 import com.example.mytodoapp.R
 import com.example.mytodoapp.data.viewmodel.ToDoViewModel
 import com.example.mytodoapp.databinding.FragmentListBinding
@@ -33,18 +31,10 @@ class ListFragment : Fragment() {
     ): View? {
         val binding = FragmentListBinding.inflate(inflater, container, false)
         with(binding) {
-            addBtn.setOnClickListener {
-                findNavController().navigate(R.id.action_listFragment_to_addFragment)
-            }
-
             recyclerView.adapter = adapter
             recyclerView.layoutManager = LinearLayoutManager(requireActivity())
-
-            sharedViewModel.emptyDatabase.observe(viewLifecycleOwner, Observer {
-                val visibility = if (it) View.VISIBLE else View.INVISIBLE
-                noDataTextView.visibility = visibility
-                noDataImageView.visibility = visibility
-            })
+            this.lifecycleOwner = this@ListFragment
+            this.svm = sharedViewModel
         }
         vm.getAllData.observe(viewLifecycleOwner, Observer {
             sharedViewModel.checkIfDatabaseEmpty(it)

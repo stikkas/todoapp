@@ -17,13 +17,12 @@ import com.example.mytodoapp.R
 import com.example.mytodoapp.data.models.Priority
 import com.example.mytodoapp.data.models.ToDoData
 import com.example.mytodoapp.data.viewmodel.ToDoViewModel
-import com.example.mytodoapp.databinding.FragmentAddBinding
 import com.example.mytodoapp.databinding.FragmentUpdateBinding
 import com.example.mytodoapp.fragments.SharedViewModel
 
 class UpdateFragment : Fragment() {
 
-    private lateinit var binding: FragmentUpdateBinding
+    private var binding: FragmentUpdateBinding? = null
     private val args by navArgs<UpdateFragmentArgs>()
     private val viewModel by viewModels<ToDoViewModel>()
     private val sharedViewModel by viewModels<SharedViewModel>()
@@ -34,32 +33,30 @@ class UpdateFragment : Fragment() {
     ): View? {
         setHasOptionsMenu(true)
         binding = FragmentUpdateBinding.inflate(inflater, container, false)
-        with(binding) {
-            val item = args.currentItem
-            curTitleEd.setText(item.title)
-            curDescEd.setText(item.description)
-            val pos = when (item.priority) {
-                Priority.HIGH -> 0
-                Priority.MEDIUM -> 1
-                else -> 2
-            }
+        with(binding!!) {
+            this.args = this@UpdateFragment.args
             curSpinner.onItemSelectedListener = sharedViewModel.listener
-            curSpinner.setSelection(pos)
-
         }
-        return binding.root
+        return binding!!.root
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.update_fragment_menu, menu)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menuSave -> updateData()
             R.id.menuDelete -> removeItem()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onDestroyView() {
+        binding = null
+        super.onDestroyView()
     }
 
     private fun removeItem() {
@@ -79,7 +76,7 @@ class UpdateFragment : Fragment() {
     }
 
     private fun updateData() {
-        with(binding) {
+        with(binding!!) {
             val title = curTitleEd.text.toString()
             val desc = curDescEd.text.toString()
             val priority = when (curSpinner.selectedItemPosition) {
@@ -88,7 +85,7 @@ class UpdateFragment : Fragment() {
                 else -> Priority.LOW
             }
             if (sharedViewModel.verifyData(title, desc)) {
-                val item = ToDoData(args.currentItem.id, title, priority, desc)
+                val item = ToDoData(args!!.currentItem.id, title, priority, desc)
                 viewModel.updateData(item)
                 findNavController().navigate(R.id.action_updateFragment_to_listFragment)
             } else {

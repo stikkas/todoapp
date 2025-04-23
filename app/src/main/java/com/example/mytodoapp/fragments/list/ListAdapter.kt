@@ -15,39 +15,12 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
     private var dataList = emptyList<ToDoData>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        val binding = RowLayoutBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
-        return MyViewHolder(binding)
+        return MyViewHolder.from(parent)
     }
 
-    override fun onBindViewHolder(
-        holder: MyViewHolder,
-        position: Int
-    ) {
-        with(holder.binding) {
-            val item = dataList[position]
-            titleTxt.text = item.title
-            descTxt.text = item.description
-            val color = when (item.priority) {
-                Priority.LOW -> R.color.green
-                Priority.MEDIUM -> R.color.yellow
-                Priority.HIGH -> R.color.red
-            }
-            priorityIndicator.setCardBackgroundColor(
-                ContextCompat.getColor(
-                    holder.itemView.context,
-                    color
-                )
-            )
-            rowBackground.setOnClickListener {
-                val action =
-                    ListFragmentDirections.actionListFragmentToUpdateFragment(dataList[position])
-                holder.itemView.findNavController().navigate(action)
-            }
-        }
+    override fun onBindViewHolder( holder: MyViewHolder, position: Int ) {
+        val item = dataList[position]
+        holder.bind(item)
     }
 
     override fun getItemCount(): Int {
@@ -59,5 +32,21 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
         notifyDataSetChanged()
     }
 
-    class MyViewHolder(val binding: RowLayoutBinding) : RecyclerView.ViewHolder(binding.root)
+    class MyViewHolder(val binding: RowLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(data: ToDoData) {
+            binding.toDoData = data
+            binding.executePendingBindings()
+        }
+
+        companion object {
+            fun from(parent: ViewGroup): MyViewHolder {
+                val binding = RowLayoutBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+                return MyViewHolder(binding)
+            }
+        }
+    }
 }

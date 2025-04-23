@@ -12,11 +12,16 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.mytodoapp.R
+import com.example.mytodoapp.data.models.ToDoData
 import com.example.mytodoapp.data.viewmodel.ToDoViewModel
 import com.example.mytodoapp.databinding.FragmentListBinding
 import com.example.mytodoapp.fragments.SharedViewModel
+import com.example.mytodoapp.fragments.list.adapter.ListAdapter
+import com.google.android.material.snackbar.Snackbar
 
 
 class ListFragment : Fragment() {
@@ -35,6 +40,7 @@ class ListFragment : Fragment() {
             recyclerView.layoutManager = LinearLayoutManager(requireActivity())
             this.lifecycleOwner = this@ListFragment
             this.svm = sharedViewModel
+            swipeToDelete(recyclerView)
         }
         vm.getAllData.observe(viewLifecycleOwner, Observer {
             sharedViewModel.checkIfDatabaseEmpty(it)
@@ -54,6 +60,31 @@ class ListFragment : Fragment() {
             deleteAll()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun swipeToDelete(view: RecyclerView) {
+        val callback = object : SwipeToDelete() {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                val item = adapter.dataList[position]
+                vm.deleteData(item)
+                adapter.notifyItemRemoved(position)
+                restoreDeletedData(viewHolder.itemView, item, position)
+            }
+        }
+        val helper = ItemTouchHelper(callback)
+        helper.attachToRecyclerView(view)
+    }
+
+    private fun restoreDeletedData(view: View, delItem: ToDoData, position: Int) {
+        val snackBar = Snackbar.make(
+            view, "Deleted '${delItem.title}", Snackbar.LENGTH_LONG
+        )
+        snackBar.setAction("Undo") {
+            vm.insertData(delItem)
+            adapter.notifyItemChanged(position)
+        }
+        snackBar.show()
     }
 
     private fun deleteAll() {

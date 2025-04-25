@@ -54,6 +54,7 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.room.common.jvm)
     implementation(libs.room.runtime)
+    implementation(libs.recyclerview.animators)
     kapt(libs.room.compiler)
     implementation( libs.room.ktx)
     testImplementation(libs.junit)

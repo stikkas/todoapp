@@ -7,6 +7,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.example.mytodoapp.data.models.Priority
 import com.example.mytodoapp.data.models.ToDoData
 
 @Dao
@@ -28,4 +29,7 @@ interface ToDoDao {
 
     @Query("select * from todo where title like :query")
     fun search(query: String): LiveData<List<ToDoData>>
+
+    @Query("select * from todo order by CASE WHEN priority = :priority THEN 1 WHEN priority like 'M%' THEN 2 ELSE 3 END")
+    fun sortByPriority(priority: Priority): LiveData<List<ToDoData>>
 }

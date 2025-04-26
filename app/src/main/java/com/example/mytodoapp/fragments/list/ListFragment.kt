@@ -8,14 +8,17 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.GridLayout
 import androidx.appcompat.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.mytodoapp.R
 import com.example.mytodoapp.data.models.ToDoData
 import com.example.mytodoapp.data.viewmodel.ToDoViewModel
@@ -39,7 +42,10 @@ class ListFragment : Fragment(), SearchView.OnQueryTextListener {
         val binding = FragmentListBinding.inflate(inflater, container, false)
         with(binding) {
             recyclerView.adapter = adapter
-            recyclerView.layoutManager = LinearLayoutManager(requireActivity())
+//            recyclerView.layoutManager = GridLayoutManager(requireActivity(), 2)
+//            recyclerView.layoutManager = LinearLayoutManager(requireActivity())
+            recyclerView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+
             recyclerView.itemAnimator = SlideInUpAnimator().apply {
                 addDuration = 300
             }
@@ -67,6 +73,12 @@ class ListFragment : Fragment(), SearchView.OnQueryTextListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.menuDeleteAll) {
             deleteAll()
+        } else {
+            when (item.itemId) {
+                R.id.mHiPriority -> vm.sortByHighPriority
+                R.id.mLoPriority -> vm.sortByLowPriority
+                else -> null
+            }?.observe(this, Observer { adapter.setData(it) })
         }
         return super.onOptionsItemSelected(item)
     }

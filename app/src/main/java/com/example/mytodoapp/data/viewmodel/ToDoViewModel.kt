@@ -8,7 +8,6 @@ import com.example.mytodoapp.data.ToDoDb
 import com.example.mytodoapp.data.models.ToDoData
 import com.example.mytodoapp.data.repository.ToDoRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class ToDoViewModel(app: Application) : AndroidViewModel(app) {
@@ -16,6 +15,8 @@ class ToDoViewModel(app: Application) : AndroidViewModel(app) {
     private val repository: ToDoRepository = ToDoRepository(toDoDao)
 
     val getAllData: LiveData<List<ToDoData>> = repository.getAllData
+    val sortByHighPriority = repository.sortByHighPriority
+    val sortByLowPriority = repository.sortByLowPriority
 
     fun insertData(data: ToDoData) {
         viewModelScope.launch(Dispatchers.IO) {

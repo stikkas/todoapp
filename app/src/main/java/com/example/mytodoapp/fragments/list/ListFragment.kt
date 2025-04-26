@@ -8,6 +8,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
@@ -25,7 +26,7 @@ import com.google.android.material.snackbar.Snackbar
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 
 
-class ListFragment : Fragment() {
+class ListFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private val vm: ToDoViewModel by viewModels()
     private val sharedViewModel by viewModels<SharedViewModel>()
@@ -57,6 +58,10 @@ class ListFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.list_fragment_menu, menu)
+        (menu.findItem(R.id.menuSearch).actionView as? SearchView)?.let {
+            it.isSubmitButtonEnabled = true
+            it.setOnQueryTextListener(this)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -64,6 +69,22 @@ class ListFragment : Fragment() {
             deleteAll()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        query?.let { search(it) }
+        return true
+    }
+
+    override fun onQueryTextChange(query: String?): Boolean {
+        query?.let { search(it) }
+        return true
+    }
+
+    private fun search(query: String) {
+        vm.search("%$query%").observe(this, Observer {
+            adapter.setData(it)
+        })
     }
 
     private fun swipeToDelete(view: RecyclerView) {
@@ -105,4 +126,5 @@ class ListFragment : Fragment() {
             setMessage("Are you sure you want to remove all items?")
         }.create().show()
     }
+
 }

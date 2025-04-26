@@ -8,6 +8,7 @@ import com.example.mytodoapp.data.ToDoDb
 import com.example.mytodoapp.data.models.ToDoData
 import com.example.mytodoapp.data.repository.ToDoRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class ToDoViewModel(app: Application) : AndroidViewModel(app) {
@@ -38,5 +39,9 @@ class ToDoViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.deleteAll()
         }
+    }
+
+    fun search(query: String): LiveData<List<ToDoData>> {
+        return repository.search(query)
     }
 }
